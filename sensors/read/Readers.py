@@ -56,20 +56,16 @@ class FileReader(Reader):
 
 
 class RandomReader(Reader):
-    comp = None
-
     def _do_read(self):
         if not self.handle:
             self.handler = RandomHandler()
 
         num = self.handler.get()
-        if not self.comp:
-            self.comp = [num, 1]
+        if not self.data:
+            self.data = [num, 1]
         else:
-            self.comp[0] += num
-            self.comp[1] += 1
-
-        self.data = self.comp
+            self.data[0] += num
+            self.data[1] += 1
 
 
 class TiltSensorReader(Reader):
