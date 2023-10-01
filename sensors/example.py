@@ -10,7 +10,4 @@ if __name__ == '__main__':
     while True:
         out = m.readProc()
         print(out)
-        # print(
-        #     '%s | %s | %s' % (out[0] * (0.1/out[3]), out[1] * (0.1/out[3]), out[2] * (0.1/out[3]))
-        # )
         time.sleep(1)

@@ -1,8 +1,8 @@
 import random
-
-# Taken and addapted from: https://srituhobby.com/how-to-use-the-mpu6050-sensor-module-with-raspberry-pi-board/?wmc-currency=EUR
-# This can only run on a Raspberry Pi.
 import platform
+import keyboard
+import cv2
+from .PointTypes import TiltSensorAnglesDelta
 
 is_raspberrypi = False
 try:
@@ -13,35 +13,31 @@ try:
 except Exception:
     pass
 
-import keyboard
-
-from .PointTypes import TiltSensorAnglesDelta
-
-
 if is_raspberrypi:
+    # Taken and addapted from: https://srituhobby.com/how-to-use-the-mpu6050-sensor-module-with-raspberry-pi-board/?wmc-currency=EUR
+    # This can only run on a Raspberry Pi.
+
     # Setup GPIO pins
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
 
-#some MPU6050 Registers and their Address
-PWR_MGMT_1   = 0x6B
-SMPLRT_DIV   = 0x19
-CONFIG       = 0x1A
-GYRO_CONFIG  = 0x1B
-INT_ENABLE   = 0x38
-ACCEL_XOUT = 0x3B
-ACCEL_YOUT = 0x3D
-ACCEL_ZOUT = 0x3F
-GYRO_XOUT  = 0x43
-GYRO_YOUT  = 0x45
-GYRO_ZOUT  = 0x47
+    #some MPU6050 Registers and their Address
+    PWR_MGMT_1   = 0x6B
+    SMPLRT_DIV   = 0x19
+    CONFIG       = 0x1A
+    GYRO_CONFIG  = 0x1B
+    INT_ENABLE   = 0x38
+    ACCEL_XOUT = 0x3B
+    ACCEL_YOUT = 0x3D
+    ACCEL_ZOUT = 0x3F
+    GYRO_XOUT  = 0x43
+    GYRO_YOUT  = 0x45
+    GYRO_ZOUT  = 0x47
 
-ROLL_OFFSET = -43.33132373545563
-PITCH_OFFSET = 5.5270300632131235
-YAW_OFFSET = -3.3252380888113975
+    ROLL_OFFSET = -43.33132373545563
+    PITCH_OFFSET = 5.5270300632131235
+    YAW_OFFSET = -3.3252380888113975
 
-
-if is_raspberrypi:
     class TiltSensorHandler:
         bus = None
         Device_Address = 0x68  # MPU6050 device address
@@ -104,14 +100,14 @@ class RandomHandler:
 
 
 class KeyboardHandler:
-    units = 5
+    units = 0.1
 
     def get(self):
         ret = [0,0]
         if keyboard.is_pressed("a"):
-            ret[0] = -self.units
-        elif keyboard.is_pressed("d"):
             ret[0] = self.units
+        elif keyboard.is_pressed("d"):
+            ret[0] = -self.units
 
         if keyboard.is_pressed("w"):
             ret[1] = self.units
@@ -119,3 +115,21 @@ class KeyboardHandler:
             ret[1] = -self.units
 
         return ret
+
+
+class CameraHandler:
+    def __init__(self):
+        self.webcam = cv2.VideoCapture(0)
+        self.frame_size = (
+            self.webcam.get(cv2.CAP_PROP_FRAME_WIDTH),
+            self.webcam.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        )
+
+    def get(self):
+        # We get a new frame from the webcam
+        _, frame = self.webcam.read()
+        return frame
+
+    def hangup(self):
+        self.webcam.release()
+        cv2.destroyAllWindows()

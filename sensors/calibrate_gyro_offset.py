@@ -1,5 +1,5 @@
 from read.Manager import ManageRead
-from read.Readers import RandomReader, TiltSensorReader
+from read.Readers import TiltSensorReader
 import time
 
 if __name__ == '__main__':

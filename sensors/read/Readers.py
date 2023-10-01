@@ -1,14 +1,12 @@
-import time
-import sys
-from read.handlers import RandomHandler, TiltSensorHandler, KeyboardHandler
+from .handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler
 import os
-import json
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)
 
 
 class Reader:
+    name = 'reader'
     read_rate = 0
     data = None
     handle = None
@@ -18,13 +16,16 @@ class Reader:
 
     def read(self):
         while True:
-            if os.path.isfile(f"{parent_dir}/flag_files/.clear"):
-                os.remove(f"{parent_dir}/flag_files/.clear")
-                self.dump()
+            if os.path.isfile(f"{parent_dir}/flag_files/.clear-{self.name}"):
+                try:
+                    os.remove(f"{parent_dir}/flag_files/.clear-{self.name}")
+                    self.dump()
+                except Exception:
+                    pass
 
             self._do_read()
-            yield json.dumps(self.data)
-            time.sleep(self.read_rate)
+            yield self.data
+            # time.sleep(self.read_rate)
 
     def _do_read(self):
         Exception('_do_read must be over written.')
@@ -34,6 +35,7 @@ class Reader:
 
 
 class FileReader(Reader):
+    name = 'file-reader'
     file = None
 
     def __init__(self, read_rate, file):
@@ -56,6 +58,8 @@ class FileReader(Reader):
 
 
 class RandomReader(Reader):
+    name = 'random-reader'
+
     def _do_read(self):
         if not self.handle:
             self.handler = RandomHandler()
@@ -69,6 +73,7 @@ class RandomReader(Reader):
 
 
 class TiltSensorReader(Reader):
+    name = 'tilt-reader'
 
     def _do_read(self):
         if not self.handle:
@@ -81,11 +86,9 @@ class TiltSensorReader(Reader):
         else:
             self.data = new_data
 
-    def dump(self):
-        self.data = None
-
 
 class KeyboardReader(Reader):
+    name = 'keyboard-reader'
 
     def _do_read(self):
         if not self.handle:
@@ -98,5 +101,12 @@ class KeyboardReader(Reader):
         else:
             self.data = new_data
 
-    def dump(self):
-        self.data = None
+
+class CameraReader(Reader):
+    name = 'camera-reader'
+
+    def _do_read(self):
+        if not self.handle:
+            self.handle = CameraHandler()
+
+        self.data = self.handle.get()
