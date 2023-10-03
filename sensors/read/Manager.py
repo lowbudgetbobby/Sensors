@@ -1,5 +1,5 @@
 import os
-from multiprocessing import Queue
+from multiprocessing import Queue, Event
 import multiprocessing as mp
 
 
@@ -14,36 +14,40 @@ class ManageRead:
         self.proc = None
         self.queue = None
         self.thread = None
+        self.clear_event = None
         # @todo make this into a list of readers so I can have 1 manager
         # pool multiple processes at once and manage.
         self.reader = reader
 
-    def _do_thread_proc(self, queue):
-        for val in self.reader.read():
-            if not queue.empty():
-                queue.get()  # remove whatever is queued so we can refresh the value.
-            queue.put(val)
+    def _do_thread_proc(self, queue, clear_event):
+        while True:
+            while not queue.empty():
+                # remove whatever is queued so we can refresh the value.
+                try:
+                    queue.get_nowait()
+                except Exception:
+                    pass
+
+            if clear_event.is_set():
+                self.reader.dump()
+                clear_event.clear()
+
+            self.reader.do_read()
+            queue.put(self.reader.data)
 
     def runProc(self):
         self.queue = Queue(maxsize=1)
-        self.thread = mp.Process(target=self._do_thread_proc, args=(self.queue,))
+        self.clear_event = Event()
+        self.thread = mp.Process(target=self._do_thread_proc, args=(self.queue, self.clear_event))
         self.thread.daemon = True  # thread dies with the program
         self.thread.start()
 
     def readProc(self, wait=True, reset_data=True):
-        # I'm not fully sure why the following works...but it does...I presume because this technically
-        # forces a wait on when the queue has a value...I'm going to ignore this for now and just leave it.
-        val = self.queue.get()
-        while True:
-            try:
-                line = self.queue.get()
-            except Exception:
-                line = None
-            if line is not None:
-                val = line
-                break
-            if not wait:
-                break
+        try:
+            val = self.queue.get()
+        except Exception:
+            val = None
+
         if reset_data:
-            open(f"{parent_dir}/flag_files/.clear-{self.reader.name}", "w")
+            self.clear_event.set()
         return val

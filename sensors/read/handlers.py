@@ -2,6 +2,7 @@ import random
 import platform
 import keyboard
 import cv2
+import numpy
 from .PointTypes import TiltSensorAnglesDelta
 
 is_raspberrypi = False
@@ -128,8 +129,11 @@ class CameraHandler:
     def get(self):
         # We get a new frame from the webcam
         _, frame = self.webcam.read()
-        return frame
+        if type(frame).__module__ == numpy.__name__:
+            return frame
+        else:
+            return None
 
-    def hangup(self):
+    def close(self):
         self.webcam.release()
         cv2.destroyAllWindows()

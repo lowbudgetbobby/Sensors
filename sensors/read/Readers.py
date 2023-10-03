@@ -7,12 +7,8 @@ parent_dir = os.path.dirname(directory)
 
 class Reader:
     name = 'reader'
-    read_rate = 0
     data = None
     handle = None
-
-    def __init__(self, read_rate):
-        self.read_rate = read_rate
 
     def read(self):
         while True:
@@ -23,11 +19,10 @@ class Reader:
                 except Exception:
                     pass
 
-            self._do_read()
+            self.do_read()
             yield self.data
-            # time.sleep(self.read_rate)
 
-    def _do_read(self):
+    def do_read(self):
         Exception('_do_read must be over written.')
 
     def dump(self):
@@ -38,14 +33,11 @@ class FileReader(Reader):
     name = 'file-reader'
     file = None
 
-    def __init__(self, read_rate, file):
-        super().__init__(read_rate)
+    def __init__(self, file):
         self.file = file
+        self.handle = open(self.file, "r")
 
-    def _do_read(self):
-        if not self.handle:
-            self.handle = open(self.file, "r")
-
+    def do_read(self):
         out = self.handle.readline().rstrip()
         if out == '':
             self.handle.close()
@@ -60,10 +52,10 @@ class FileReader(Reader):
 class RandomReader(Reader):
     name = 'random-reader'
 
-    def _do_read(self):
-        if not self.handle:
-            self.handler = RandomHandler()
+    def __init__(self):
+        self.handler = RandomHandler()
 
+    def do_read(self):
         num = self.handler.get()
         if not self.data:
             self.data = [num, 1]
@@ -75,10 +67,10 @@ class RandomReader(Reader):
 class TiltSensorReader(Reader):
     name = 'tilt-reader'
 
-    def _do_read(self):
-        if not self.handle:
-            self.handle = TiltSensorHandler()
+    def __init__(self):
+        self.handle = TiltSensorHandler()
 
+    def do_read(self):
         new_data = self.handle.get_delta_angles() + [1]
         if self.data:
             for i in range(0, len(new_data)):
@@ -90,10 +82,10 @@ class TiltSensorReader(Reader):
 class KeyboardReader(Reader):
     name = 'keyboard-reader'
 
-    def _do_read(self):
-        if not self.handle:
-            self.handle = KeyboardHandler()
+    def __init__(self):
+        self.handle = KeyboardHandler()
 
+    def do_read(self):
         new_data = self.handle.get() + [1]
         if self.data:
             for i in range(0, len(new_data)):
@@ -105,7 +97,10 @@ class KeyboardReader(Reader):
 class CameraReader(Reader):
     name = 'camera-reader'
 
-    def _do_read(self):
+    def __init__(self):
+        self.handle = None
+
+    def do_read(self):
         if not self.handle:
             self.handle = CameraHandler()
 
