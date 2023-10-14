@@ -1,17 +1,26 @@
 from .read.Manager import ManageRead
-from .read.Readers import KeyboardReader, TiltSensorReader, CameraReader
+from .read.Readers import KeyboardReader, TiltSensorReader, CameraReader, RaspPiCameraReader
 
-def TiltSensor(read_rate):
+
+def TiltSensor():
     return ManageRead(
-        TiltSensorReader(read_rate)
+        TiltSensorReader()
     )
 
-def KeyboardSensor(read_rate):
+
+def KeyboardSensor():
     return ManageRead(
-        KeyboardReader(read_rate)
+        KeyboardReader()
     )
 
-def CameraSensor(read_rate):
+
+def CameraSensor():
     return ManageRead(
-        CameraReader(read_rate)
+        CameraReader()
+    )
+
+
+def RaspPiCameraSensor():
+    return ManageRead(
+        RaspPiCameraReader()
     )

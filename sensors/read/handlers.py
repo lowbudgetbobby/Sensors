@@ -118,6 +118,33 @@ class KeyboardHandler:
         return ret
 
 
+if is_raspberrypi:
+    from imutils.video import VideoStream, FPS
+
+    class RaspPiCameraHandler:
+        vs = None
+        fps = None
+
+        def __init__(self):
+            self.vs = VideoStream(src=0, usePiCamera=True)
+            self.fps = FPS()
+
+        def start_stream(self):
+            self.vs.start()
+            self.fps.start()
+
+        def get(self):
+            try:
+                frame = self.vs.read()
+                self.fps.update()
+                return frame
+            except:
+                return None
+
+        def stop_stream(self):
+            self.fps.stop()
+            self.vs.stop()
+
 class CameraHandler:
     def __init__(self):
         self.webcam = cv2.VideoCapture(0)

@@ -1,5 +1,9 @@
 from .handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler
+import platform
 import os
+
+if platform.uname().node == 'raspberrypi':
+    from .handlers import RaspPiCameraHandler
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)
@@ -10,18 +14,6 @@ class Reader:
     data = None
     handle = None
 
-    def read(self):
-        while True:
-            if os.path.isfile(f"{parent_dir}/flag_files/.clear-{self.name}"):
-                try:
-                    os.remove(f"{parent_dir}/flag_files/.clear-{self.name}")
-                    self.dump()
-                except Exception:
-                    pass
-
-            self.do_read()
-            yield self.data
-
     def do_read(self):
         Exception('_do_read must be over written.')
 
@@ -30,14 +22,15 @@ class Reader:
 
 
 class FileReader(Reader):
-    name = 'file-reader'
     file = None
 
     def __init__(self, file):
         self.file = file
-        self.handle = open(self.file, "r")
 
     def do_read(self):
+        if not self.handle:
+            self.handle = open(self.file, "r")
+
         out = self.handle.readline().rstrip()
         if out == '':
             self.handle.close()
@@ -50,7 +43,6 @@ class FileReader(Reader):
 
 
 class RandomReader(Reader):
-    name = 'random-reader'
 
     def __init__(self):
         self.handler = RandomHandler()
@@ -65,7 +57,6 @@ class RandomReader(Reader):
 
 
 class TiltSensorReader(Reader):
-    name = 'tilt-reader'
 
     def __init__(self):
         self.handle = TiltSensorHandler()
@@ -80,7 +71,6 @@ class TiltSensorReader(Reader):
 
 
 class KeyboardReader(Reader):
-    name = 'keyboard-reader'
 
     def __init__(self):
         self.handle = KeyboardHandler()
@@ -95,7 +85,6 @@ class KeyboardReader(Reader):
 
 
 class CameraReader(Reader):
-    name = 'camera-reader'
 
     def __init__(self):
         self.handle = None
@@ -105,3 +94,14 @@ class CameraReader(Reader):
             self.handle = CameraHandler()
 
         self.data = self.handle.get()
+
+
+if platform.uname().node == 'raspberrypi':
+    class RaspPiCameraReader(Reader):
+
+        def __init__(self):
+            self.handle = RaspPiCameraHandler()
+            self.handle.start_stream()
+
+        def do_read(self):
+            self.data = self.handle.get()
