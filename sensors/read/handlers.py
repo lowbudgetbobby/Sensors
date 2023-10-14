@@ -120,6 +120,7 @@ class KeyboardHandler:
 
 if is_raspberrypi:
     from imutils.video import VideoStream, FPS
+    import imutils
 
     class RaspPiCameraHandler:
         vs = None
@@ -137,6 +138,7 @@ if is_raspberrypi:
             try:
                 frame = self.vs.read()
                 self.fps.update()
+                frame = imutils.resize(frame, width=500)
                 return frame
             except:
                 return None

@@ -100,8 +100,11 @@ if platform.uname().node == 'raspberrypi':
     class RaspPiCameraReader(Reader):
 
         def __init__(self):
-            self.handle = RaspPiCameraHandler()
-            self.handle.start_stream()
+            self.handle = None
 
         def do_read(self):
+            if not self.handle:
+                self.handle = RaspPiCameraHandler()
+                self.handle.start_stream()
+
             self.data = self.handle.get()
