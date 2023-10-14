@@ -1,5 +1,5 @@
 from setuptools import setup
-setup(name='Sensors',
+setup(name='sensors',
 version='0.1',
 description='Package for managing read from sensor input',
 url='#',
