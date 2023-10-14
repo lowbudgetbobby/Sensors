@@ -4,11 +4,15 @@ import time
 
 if __name__ == '__main__':
     m = ManageRead(
-        TiltSensorReader(0)
+        TiltSensorReader()
     )
     m.runProc()
-    time.sleep(30)
-    out = m.readProc()
+    data = m.readProc()
+    for i in range(0, 10000):
+        newData = m.readProc()
+        for j in range(0, len(newData)):
+            data[j] += newData[j]
+    out = data
     print(
         out
     )

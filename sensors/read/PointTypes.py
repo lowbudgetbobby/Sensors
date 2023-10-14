@@ -33,11 +33,12 @@ class TiltSensorAnglesDelta:
         newRoll = gyroX
         newPitch = gyroY
         newYaw = gyroZ
+
         self.rollFilter.update(newRoll)
         self.pitchFilter.update(newPitch)
         self.yawFilter.update(newYaw)
 
-        self.roll = self.rollFilter.get() + 4
+        self.roll = self.rollFilter.get()
         self.pitch = self.pitchFilter.get()
         self.yaw = self.yawFilter.get()
 

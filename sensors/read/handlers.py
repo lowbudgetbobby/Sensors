@@ -35,9 +35,9 @@ if is_raspberrypi:
     GYRO_YOUT  = 0x45
     GYRO_ZOUT  = 0x47
 
-    ROLL_OFFSET = -43.33132373545563
-    PITCH_OFFSET = 5.5270300632131235
-    YAW_OFFSET = -3.3252380888113975
+    ROLL_OFFSET = -0.3419891147334961
+    PITCH_OFFSET = 0.0493546505654258
+    YAW_OFFSET = -0.015088877203797183
 
     class TiltSensorHandler:
         bus = None
@@ -82,9 +82,9 @@ if is_raspberrypi:
 
         def get_delta_angles(self):
             # Read Gyroscope raw value
-            gyroX = self.read_raw_data(GYRO_XOUT) - ROLL_OFFSET
-            gyroY = self.read_raw_data(GYRO_YOUT) - PITCH_OFFSET
-            gyroZ = self.read_raw_data(GYRO_ZOUT) - YAW_OFFSET
+            gyroX = self.read_raw_data(GYRO_XOUT)/131.0 - ROLL_OFFSET
+            gyroY = self.read_raw_data(GYRO_YOUT)/131.0 - PITCH_OFFSET
+            gyroZ = self.read_raw_data(GYRO_ZOUT)/131.0 - YAW_OFFSET
 
             self.state.update(gyroX, gyroY, gyroZ)
 
@@ -138,7 +138,6 @@ if is_raspberrypi:
             try:
                 frame = self.vs.read()
                 self.fps.update()
-                frame = imutils.resize(frame, width=500)
                 return frame
             except:
                 return None
