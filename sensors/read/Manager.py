@@ -5,7 +5,7 @@ import multiprocessing as mp
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)
-if mp.get_start_method() != 'spawn':
+if __name__ == '__main__' and mp.get_start_method() != 'spawn':
     mp.set_start_method('spawn')
 
 
