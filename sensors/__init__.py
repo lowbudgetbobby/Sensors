@@ -1,5 +1,6 @@
 from .read.Manager import ManageRead
-from .read.Readers import KeyboardReader, TiltSensorReader, CameraReader, RaspPiCameraReader
+from .read.Readers import KeyboardReader, TiltSensorReader, CameraReader
+import platform
 
 
 def TiltSensor():
@@ -20,7 +21,10 @@ def CameraSensor():
     )
 
 
-def RaspPiCameraSensor():
-    return ManageRead(
-        RaspPiCameraReader()
-    )
+if platform.uname().node == 'raspberrypi':
+    from .read.Readers import RaspPiCameraReader
+
+    def RaspPiCameraSensor():
+        return ManageRead(
+            RaspPiCameraReader()
+        )
