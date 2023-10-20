@@ -42,7 +42,7 @@ class ManageRead:
         self.thread.daemon = True  # thread dies with the program
         self.thread.start()
 
-    def readProc(self, wait=True, reset_data=True):
+    def readProc(self, reset_data=True):
         try:
             val = self.queue.get()
         except Exception:

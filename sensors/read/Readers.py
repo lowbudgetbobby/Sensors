@@ -11,7 +11,6 @@ parent_dir = os.path.dirname(directory)
 
 
 class Reader:
-    name = 'reader'
     data = None
     handle = None
 
@@ -20,6 +19,24 @@ class Reader:
 
     def dump(self):
         self.data = None
+
+
+class ReaderCollection(Reader):
+
+    def __init__(self, readers: list[Reader]):
+        self.readers = readers
+
+    def do_read(self):
+        self.data = []
+        for reader in self.readers:
+            reader.do_read()
+            self.data.append(reader.data)
+
+    def dump(self):
+        self.data = None
+        for reader in self.readers:
+            reader.dump()
+
 
 
 class FileReader(Reader):

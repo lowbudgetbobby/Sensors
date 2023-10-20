@@ -23,7 +23,7 @@ if __name__ == '__main__':
     m.runProc()
     if read_rate:
         while True:
-            data = m.readProc(True, True)
+            data = m.readProc()
             os.system('cls' if os.name == 'nt' else 'clear')
             print(data)
             time.sleep(read_rate)

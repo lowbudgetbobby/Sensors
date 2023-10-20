@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     m.runProc()
     while True:
-        data = m.readProc(True, True)
+        data = m.readProc()
         os.system('cls' if os.name == 'nt' else 'clear')
         print(
             '%.4f | %.4f | %.4f' % (data[0] / data[3], data[1] / data[3], data[2] / data[3])

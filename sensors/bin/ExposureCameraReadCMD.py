@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     m.runProc()
     while True:
-        data = m.readProc(True, False)
+        data = m.readProc(False)
         if data is not None:
             cv2.imshow("Demo", data)
         else:

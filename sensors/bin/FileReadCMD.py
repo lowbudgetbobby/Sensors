@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     m.runProc()
     while True:
-        data = m.readProc(True, True)
+        data = m.readProc()
         os.system('cls' if os.name == 'nt' else 'clear')
         print(data)
         if not data:
