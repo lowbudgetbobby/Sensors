@@ -1,6 +1,7 @@
 from .handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler
 import platform
 import os
+import numpy as np
 
 if platform.uname().node == 'raspberrypi':
     from .handlers import RaspPiCameraHandler
@@ -94,6 +95,35 @@ class CameraReader(Reader):
             self.handle = CameraHandler()
 
         self.data = self.handle.get()
+
+
+class ExposureCameraReader(CameraReader):
+
+    def __init__(self, sampling):
+        super().__init__()
+        self.sampling = sampling
+        self.frames = []
+
+    def do_read(self):
+        if not self.handle:
+            self.handle = CameraHandler()
+
+        img = self.handle.get()
+        if img is None:
+            return None
+
+        self.frames.append(img)
+        if len(self.frames) > self.sampling:
+            self.frames.pop(0)
+
+        div = len(self.frames)
+        f = None
+        for frame in self.frames:
+            if f is None:
+                f = frame / div
+            else:
+                f += frame / div
+        self.data = np.asarray(f, dtype=np.uint8)
 
 
 if platform.uname().node == 'raspberrypi':
