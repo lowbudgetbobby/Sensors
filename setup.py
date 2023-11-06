@@ -6,5 +6,5 @@ url='#',
 author='Low Budget Bob',
 author_email='lowbudgetbobby@email.com',
 # license='MIT',
-packages=['sensors', 'sensors/read', 'sensors/utils'],
+packages=['sensors', 'sensors/read', 'sensors/write', 'sensors/utils'],
 zip_safe=False)
