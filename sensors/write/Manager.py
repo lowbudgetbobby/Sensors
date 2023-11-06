@@ -33,7 +33,10 @@ class ManageWriter:
 
     def writeProc(self, data):
         if self.queue.full():
-            self.queue.get_nowait()
+            try:
+                self.queue.get_nowait()
+            except Exception:
+                pass
 
         self.queue.put(data)
         if self.clear_event.is_set():
