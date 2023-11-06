@@ -111,6 +111,9 @@ if is_raspberrypi:
         def read(self):
             return GPIO.input(READ_STATE_PIN)
 
+        def cleanup(self):
+            GPIO.cleanup()
+
 else:
     class TiltSensorHandler:
         def get_delta_angles(self):
