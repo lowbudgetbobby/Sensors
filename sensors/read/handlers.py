@@ -89,9 +89,34 @@ if is_raspberrypi:
             self.state.update(gyroX, gyroY, gyroZ)
 
             return self.state.serialize()
+
+
+    READ_STATE_PIN = 5
+    # WRITE_START_PIN = 6
+    WRITE_RESET_PIN = 13
+
+    class StartStopButtonHandler:
+        def __init__(self):
+            self._init_mem()
+            self.reset()
+
+        def _init_mem(self):
+            GPIO.setup(READ_STATE_PIN, GPIO.IN)
+            GPIO.setup(WRITE_RESET_PIN, GPIO.OUT)
+
+        def reset(self):
+            GPIO.output(WRITE_RESET_PIN, 0)
+
+        def read(self):
+            return GPIO.input(READ_STATE_PIN)
+
 else:
     class TiltSensorHandler:
         def get_delta_angles(self):
+            pass
+
+    class StartStopButtonHandler:
+        def read(self):
             pass
 
 
