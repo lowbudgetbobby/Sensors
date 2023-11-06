@@ -9,6 +9,9 @@ sys.path.append(parent)
 
 from read.Readers import CameraReader
 from read.Manager import ManageRead
+from write.Writers import ImageWriter
+from write.Manager import ManageWriter
+from write.Types import ImageWriteObject
 
 
 if __name__ == '__main__':
@@ -19,20 +22,23 @@ if __name__ == '__main__':
             CameraReader()
     )
 
+    w = ManageWriter(
+        ImageWriter()
+    )
+
     m.runProc()
+    w.runProc()
     while True:
         data = m.readProc(False)
 
         if data is not None:
-            cv2.imshow("Demo", data)
+            w.writeProc(
+                ImageWriteObject(data)
+            )
         else:
             print("dropped frame.")
-        k = cv2.waitKey(1)
-        if k == 27:
-            break
+
 
         time.sleep(read_rate)
-
-    cv2.destroyAllWindows()
 
     sys.exit(1)

@@ -105,7 +105,8 @@ if is_raspberrypi:
             GPIO.setup(WRITE_RESET_PIN, GPIO.OUT)
 
         def reset(self):
-            GPIO.output(WRITE_RESET_PIN, 0)
+            GPIO.output(WRITE_RESET_PIN, GPIO.HIGH)
+            GPIO.output(WRITE_RESET_PIN, GPIO.LOW)
 
         def read(self):
             return GPIO.input(READ_STATE_PIN)

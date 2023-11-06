@@ -1,10 +1,10 @@
-from .handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler
+from .Handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler, StartStopButtonHandler
 import platform
 import os
 import numpy as np
 
 if platform.uname().node == 'raspberrypi':
-    from .handlers import RaspPiCameraHandler
+    from .Handlers import RaspPiCameraHandler
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)
@@ -155,3 +155,15 @@ if platform.uname().node == 'raspberrypi':
                 self.handle.start_stream()
 
             self.data = self.handle.get()
+
+
+    class StartStopButtonReader(Reader):
+
+        def __init__(self):
+            self.handle = None
+
+        def do_read(self):
+            if not self.handle:
+                self.handle = StartStopButtonHandler()
+
+            self.data = self.handle.read()
