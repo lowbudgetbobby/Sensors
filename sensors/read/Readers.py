@@ -1,10 +1,10 @@
-from .Handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler, StartStopButtonHandler
+from sensors.read.Handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler, StartStopButtonHandler
 import platform
 import os
 import numpy as np
 
 if platform.uname().node == 'raspberrypi':
-    from .Handlers import RaspPiCameraHandler
+    from sensors.read.Handlers import RaspPiCameraHandler
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)

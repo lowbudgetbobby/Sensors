@@ -2,9 +2,6 @@ import os
 from multiprocessing import Queue, Event
 import multiprocessing as mp
 
-
-directory = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(directory)
 if __name__ == '__main__' and mp.get_start_method() != 'spawn':
     mp.set_start_method('spawn')
 

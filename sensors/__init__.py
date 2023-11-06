@@ -1,5 +1,5 @@
-from .read.Manager import ManageRead
-from .read.Readers import KeyboardReader, TiltSensorReader, CameraReader
+from sensors.read.Manager import ManageRead
+from sensors.read.Readers import KeyboardReader, TiltSensorReader, CameraReader
 import platform
 
 

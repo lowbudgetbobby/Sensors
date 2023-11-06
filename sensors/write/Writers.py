@@ -1,6 +1,6 @@
 import cv2
-from .Handlers import ImageToDesktopHandler
-from .Types import ImageWriteObject
+from sensors.write.Handlers import ImageToDesktopHandler
+from sensors.write.Types import ImageWriteObject
 
 
 class Writer:
