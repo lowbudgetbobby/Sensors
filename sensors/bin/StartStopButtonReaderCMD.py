@@ -1,6 +1,5 @@
 import sys
 import os
-import cv2
 import time
 
 directory = os.path.dirname(os.path.realpath(__file__))
