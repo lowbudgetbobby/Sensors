@@ -1,5 +1,5 @@
 class ImageWriteObject:
-    def __init__(self, img, resize=None, name='default'):
+    def __init__(self, img, size=None, text='default'):
         self.img = img
-        self.resize = resize
-        self.name = name
+        self.size = size
+        self.text = text

@@ -25,11 +25,11 @@ class ImageWriter(Writer):
         if self.handle is None:
             self.handle = self.handle_class()
 
-        if data.resize is not None:
-            img = cv2.resize(data.img, data.resize)
+        if data.size is not None:
+            img = cv2.resize(data.img, data.size)
         else:
             img = data.img
 
         return self.handle.write(
-            img, data.name
+            img, data.text
         )
