@@ -149,10 +149,13 @@ if is_raspberrypi:
 
 
     from picamera import PiCamera
+    from picamera.array import PiRGBArray
     from io import BytesIO
     class PiCameraHandler:
         camera = None
         format = None
+        stream = None
+        rawCapture = None
 
         def __init__(self, format='jpeg', resolution=None):
             self.camera = PiCamera()
@@ -160,12 +163,28 @@ if is_raspberrypi:
                 self.camera.resolution = resolution
             self.format = format
 
-        def get(self):
-            stream = BytesIO()
-            self.camera.capture(stream, format=self.format)
-            stream.seek(0)
+            self.rawCapture = BytesIO()
+            self.stream = self.camera.capture_continuous(
+                self.rawCapture,
+                format=format,
+                use_video_port=True
+            )
 
-            return stream.read()
+        def get(self):
+            try:
+                self.stream.seek(0)
+                frame = self.stream.read()
+                self.rawCapture.truncate(0)
+
+                return frame
+            except Exception:
+                self.stop()
+
+        def stop(self):
+            self.stream.close()
+            self.rawCapture.close()
+            self.camera.close()
+
 
 else:
     class TiltSensorHandler:
