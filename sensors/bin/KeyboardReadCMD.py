@@ -16,7 +16,7 @@ if __name__ == '__main__':
     args.pop(0) # get rid of the first argument, it's this file's name.
     read_rate = float(args.pop(0))
     m = ManageRead(
-            KeyboardReader()
+        KeyboardReader()
     )
 
     m.runProc()

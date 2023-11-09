@@ -3,7 +3,7 @@ import platform
 import keyboard
 import cv2
 import numpy
-from .PointTypes import TiltSensorAnglesDelta
+from .Types import TiltSensorAnglesDelta
 
 is_raspberrypi = False
 try:
@@ -90,6 +90,9 @@ if is_raspberrypi:
 
             return self.state.serialize()
 
+        def get(self):
+            return self.get_delta_angles()
+
 
     READ_STATE_PIN = 5
     # WRITE_START_PIN = 6
@@ -111,16 +114,64 @@ if is_raspberrypi:
         def read(self):
             return GPIO.input(READ_STATE_PIN)
 
+        def get(self):
+            return self.read()
+
         def cleanup(self):
             GPIO.cleanup()
 
+
+    from imutils.video import VideoStream, FPS
+    class FPSCameraHandler:
+        vs = None
+        fps = None
+
+        def __init__(self):
+            self.vs = VideoStream(src=0, usePiCamera=True)
+            self.fps = FPS()
+            self.start_stream()
+
+        def start_stream(self):
+            self.vs.start()
+            self.fps.start()
+
+        def get(self):
+            try:
+                frame = self.vs.read()
+                self.fps.update()
+                return frame
+            except:
+                return None
+
+        def stop_stream(self):
+            self.fps.stop()
+            self.vs.stop()
+
+
+    from picamera import PiCamera
+    from io import BytesIO
+    class PiCameraHandler:
+        camera = None
+        format = None
+
+        def __init__(self, format='jpeg'):
+            self.camera = PiCamera()
+            self.format = format
+
+        def get(self):
+            stream = BytesIO()
+            self.camera.capture(stream, format=self.format)
+            stream.seek(0)
+
+            return stream
+
 else:
     class TiltSensorHandler:
-        def get_delta_angles(self):
+        def get(self):
             pass
 
     class StartStopButtonHandler:
-        def read(self):
+        def get(self):
             pass
 
 
@@ -146,34 +197,6 @@ class KeyboardHandler:
 
         return ret
 
-
-if is_raspberrypi:
-    from imutils.video import VideoStream, FPS
-    import imutils
-
-    class RaspPiCameraHandler:
-        vs = None
-        fps = None
-
-        def __init__(self):
-            self.vs = VideoStream(src=0, usePiCamera=True)
-            self.fps = FPS()
-
-        def start_stream(self):
-            self.vs.start()
-            self.fps.start()
-
-        def get(self):
-            try:
-                frame = self.vs.read()
-                self.fps.update()
-                return frame
-            except:
-                return None
-
-        def stop_stream(self):
-            self.fps.stop()
-            self.vs.stop()
 
 class CameraHandler:
     def __init__(self):
