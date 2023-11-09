@@ -163,7 +163,7 @@ if is_raspberrypi:
             self.camera.capture(stream, format=self.format)
             stream.seek(0)
 
-            return stream
+            return stream.read()
 
 else:
     class TiltSensorHandler:
