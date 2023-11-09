@@ -154,8 +154,10 @@ if is_raspberrypi:
         camera = None
         format = None
 
-        def __init__(self, format='jpeg'):
+        def __init__(self, format='jpeg', resolution=None):
             self.camera = PiCamera()
+            if resolution is not None:
+                self.camera.resolution = resolution
             self.format = format
 
         def get(self):
