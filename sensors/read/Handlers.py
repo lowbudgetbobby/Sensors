@@ -1,7 +1,5 @@
 import random
 import platform
-import keyboard
-import cv2
 import numpy
 from .Types import TiltSensorAnglesDelta
 
@@ -121,35 +119,7 @@ if is_raspberrypi:
             GPIO.cleanup()
 
 
-    from imutils.video import VideoStream, FPS
-    class FPSCameraHandler:
-        vs = None
-        fps = None
-
-        def __init__(self):
-            self.vs = VideoStream(src=0, usePiCamera=True)
-            self.fps = FPS()
-            self.start_stream()
-
-        def start_stream(self):
-            self.vs.start()
-            self.fps.start()
-
-        def get(self):
-            try:
-                frame = self.vs.read()
-                self.fps.update()
-                return frame
-            except:
-                return None
-
-        def stop_stream(self):
-            self.fps.stop()
-            self.vs.stop()
-
-
     from picamera import PiCamera
-    from picamera.array import PiRGBArray
     from io import BytesIO
     class PiCameraHandler:
         camera = None
@@ -193,6 +163,15 @@ if is_raspberrypi:
             self.camera.close()
 
 
+    class KeyboardHandler:
+        def get(self):
+            pass
+
+
+    class CameraHandler:
+        def get(self):
+            pass
+
 else:
     class TiltSensorHandler:
         def get(self):
@@ -203,45 +182,50 @@ else:
             pass
 
 
+    import keyboard
+    class KeyboardHandler:
+        units = 0.1
+
+        def get(self):
+            ret = [0, 0]
+            if keyboard.is_pressed("a"):
+                ret[0] = self.units
+            elif keyboard.is_pressed("d"):
+                ret[0] = -self.units
+
+            if keyboard.is_pressed("w"):
+                ret[1] = self.units
+            elif keyboard.is_pressed("s"):
+                ret[1] = -self.units
+
+            return ret
+
+
+    import cv2
+    class CameraHandler:
+        def __init__(self):
+            self.webcam = cv2.VideoCapture(0)
+            self.frame_size = (
+                self.webcam.get(cv2.CAP_PROP_FRAME_WIDTH),
+                self.webcam.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            )
+
+        def get(self):
+            # We get a new frame from the webcam
+            _, frame = self.webcam.read()
+            if type(frame).__module__ == numpy.__name__:
+                return frame
+            else:
+                return None
+
+        def close(self):
+            self.webcam.release()
+            cv2.destroyAllWindows()
+
+
 class RandomHandler:
     def get(self):
         return random.randint(-5, 5)
 
 
-class KeyboardHandler:
-    units = 0.1
 
-    def get(self):
-        ret = [0,0]
-        if keyboard.is_pressed("a"):
-            ret[0] = self.units
-        elif keyboard.is_pressed("d"):
-            ret[0] = -self.units
-
-        if keyboard.is_pressed("w"):
-            ret[1] = self.units
-        elif keyboard.is_pressed("s"):
-            ret[1] = -self.units
-
-        return ret
-
-
-class CameraHandler:
-    def __init__(self):
-        self.webcam = cv2.VideoCapture(0)
-        self.frame_size = (
-            self.webcam.get(cv2.CAP_PROP_FRAME_WIDTH),
-            self.webcam.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        )
-
-    def get(self):
-        # We get a new frame from the webcam
-        _, frame = self.webcam.read()
-        if type(frame).__module__ == numpy.__name__:
-            return frame
-        else:
-            return None
-
-    def close(self):
-        self.webcam.release()
-        cv2.destroyAllWindows()

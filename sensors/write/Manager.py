@@ -1,4 +1,3 @@
-import os
 from multiprocessing import Queue, Event
 import multiprocessing as mp
 

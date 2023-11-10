@@ -1,4 +1,3 @@
-import cv2
 from sensors.write.Handlers import ImageToDesktopHandler
 from sensors.write.Types import ImageWriteObject
 
@@ -29,7 +28,7 @@ class ImageWriter(Writer):
 
     def do_write(self, data: ImageWriteObject):
         if data.size is not None:
-            img = cv2.resize(data.img, data.size)
+            img = self.handle_class.resize(data.img, data.size)
         else:
             img = data.img
 

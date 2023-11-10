@@ -1,4 +1,3 @@
-import cv2
 import platform
 
 is_raspberrypi = False
@@ -11,12 +10,30 @@ except Exception:
     pass
 
 
-class ImageToDesktopHandler:
-    def write(self, img, windowName):
-        cv2.imshow(windowName, img)
-        k = cv2.waitKey(1)
-        if k == 27:
-            cv2.destroyAllWindows()
-            return False
+if not is_raspberrypi:
+    import cv2
 
-        return True
+    class ImageToDesktopHandler:
+
+        @staticmethod
+        def resize(img, size):
+            img = cv2.resize(img, size)
+            return img
+
+        def write(self, img, windowName):
+            cv2.imshow(windowName, img)
+            k = cv2.waitKey(1)
+            if k == 27:
+                cv2.destroyAllWindows()
+                return False
+
+            return True
+
+else:
+    class ImageToDesktopHandler:
+        @staticmethod
+        def resize(img, size):
+            pass
+
+        def write(self, img, windowName):
+            pass

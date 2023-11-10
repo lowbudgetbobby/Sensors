@@ -1,10 +1,6 @@
-from sensors.read.Handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler, StartStopButtonHandler
-import platform
+from sensors.read.Handlers import RandomHandler, TiltSensorHandler, KeyboardHandler, CameraHandler
 import os
 import numpy as np
-
-if platform.uname().node == 'raspberrypi':
-    from sensors.read.Handlers import FPSCameraHandler
 
 directory = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.dirname(directory)
