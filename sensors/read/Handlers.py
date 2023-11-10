@@ -127,10 +127,12 @@ if is_raspberrypi:
         stream = None
         rawCapture = None
 
-        def __init__(self, format='jpeg', resolution=None):
+        def __init__(self, format='jpeg', resolution=None, framerate=None):
             self.camera = PiCamera()
             if resolution is not None:
                 self.camera.resolution = resolution
+            if framerate is not None:
+                self.camera.framerate = framerate
             self.format = format
 
             self.rawCapture = BytesIO()
@@ -161,6 +163,16 @@ if is_raspberrypi:
             self.stream.close()
             self.rawCapture.close()
             self.camera.close()
+
+
+    class PiCameraHandlerBuilder:
+        def __init__(self, format='jpeg', resolution=None, framerate=None):
+            self.format = format
+            self.resolution = resolution
+            self.framerate = framerate
+
+        def __call__(self):
+            return PiCameraHandler(self.format, self.resolution, self.framerate)
 
 
     class KeyboardHandler:
