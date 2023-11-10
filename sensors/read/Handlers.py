@@ -172,11 +172,11 @@ if is_raspberrypi:
 
         def get(self):
             try:
-                self.stream.seek(0)
-                frame = self.stream.read()
+                frame = self.stream.__next__()
+                frame.seek(0)
                 self.rawCapture.truncate(0)
 
-                return frame
+                return frame.read()
             except Exception:
                 self.stop()
 
