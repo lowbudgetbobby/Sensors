@@ -1,4 +1,4 @@
-import cv2
+from cv2 import KalmanFilter
 import numpy as np
 
 class Tracker():
@@ -12,7 +12,7 @@ class Tracker():
         self.id = id
 
         # The filter itself.
-        self.kalman = cv2.KalmanFilter(2, 1)
+        self.kalman = KalmanFilter(2, 1)
 
         # Kalman parameters setup for scalar.
         self.kalman.transitionMatrix = np.array([[1, 1],
