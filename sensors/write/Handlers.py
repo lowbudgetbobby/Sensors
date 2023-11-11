@@ -41,7 +41,7 @@ else:
     class ImageToDesktopHandler(HandleBase):
         is_running = True
 
-        def __init__(self):
+        def start(self):
             raise Exception('Class not available on Raspberry PI')
 
         @staticmethod
