@@ -1,4 +1,5 @@
 import platform
+from sensors.readerwriterbase import HandleBase
 
 is_raspberrypi = False
 try:
@@ -13,7 +14,14 @@ except Exception:
 if not is_raspberrypi:
     import cv2
 
-    class ImageToDesktopHandler:
+    class ImageToDesktopHandler(HandleBase):
+        is_running = True
+
+        def start(self):
+            pass
+
+        def stop(self):
+            pass
 
         @staticmethod
         def resize(img, size):
@@ -25,12 +33,17 @@ if not is_raspberrypi:
             k = cv2.waitKey(1)
             if k == 27:
                 cv2.destroyAllWindows()
-                return False
+                raise Exception('Key interupt. Stopping stream.')
 
             return True
 
 else:
-    class ImageToDesktopHandler:
+    class ImageToDesktopHandler(HandleBase):
+        is_running = True
+
+        def __init__(self):
+            raise Exception('Class not available on Raspberry PI')
+
         @staticmethod
         def resize(img, size):
             pass

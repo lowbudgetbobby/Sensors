@@ -2,6 +2,7 @@ import random
 import platform
 import numpy
 from .Types import TiltSensorAnglesDelta
+from sensors.readerwriterbase import HandleBase
 
 is_raspberrypi = False
 try:
@@ -11,6 +12,7 @@ try:
         is_raspberrypi = True
 except Exception:
     pass
+
 
 if is_raspberrypi:
     # Taken and addapted from: https://srituhobby.com/how-to-use-the-mpu6050-sensor-module-with-raspberry-pi-board/?wmc-currency=EUR
@@ -37,14 +39,19 @@ if is_raspberrypi:
     PITCH_OFFSET = 0.0493546505654258
     YAW_OFFSET = -0.015088877203797183
 
-    class TiltSensorHandler:
+    class TiltSensorHandler(HandleBase):
         bus = None
         Device_Address = 0x68  # MPU6050 device address
         state = None
 
-        def __init__(self):
+        def start(self):
             self.MPU_Init()
             self.state = TiltSensorAnglesDelta()
+            self.is_running = True
+
+        def stop(self):
+            self.require_running()
+            self.is_running = False
 
         def MPU_Init(self):
             self.bus = smbus.SMBus(1)  # or bus = smbus.SMBus(0) for older version boards
@@ -88,7 +95,8 @@ if is_raspberrypi:
 
             return self.state.serialize()
 
-        def get(self):
+        def read(self):
+            self.require_running()
             return self.get_delta_angles()
 
 
@@ -96,10 +104,11 @@ if is_raspberrypi:
     # WRITE_START_PIN = 6
     WRITE_RESET_PIN = 13
 
-    class StartStopButtonHandler:
-        def __init__(self):
+    class StartStopButtonHandler(HandleBase):
+        def start(self):
             self._init_mem()
             self.reset()
+            self.is_running = True
 
         def _init_mem(self):
             GPIO.setup(READ_STATE_PIN, GPIO.IN)
@@ -110,95 +119,96 @@ if is_raspberrypi:
             GPIO.output(WRITE_RESET_PIN, GPIO.LOW)
 
         def read(self):
+            self.require_running()
             return GPIO.input(READ_STATE_PIN)
 
-        def get(self):
-            return self.read()
-
-        def cleanup(self):
+        def stop(self):
+            self.require_running()
             GPIO.cleanup()
+            self.is_running = False
 
 
     from picamera import PiCamera
     from io import BytesIO
-    class PiCameraHandler:
+    class PiCameraHandler(HandleBase):
         camera = None
         format = None
         stream = None
         rawCapture = None
 
         def __init__(self, format='jpeg', resolution=None, framerate=None):
-            self.camera = PiCamera()
-            if resolution is not None:
-                self.camera.resolution = resolution
-            if framerate is not None:
-                self.camera.framerate = framerate
-            self.format = format
-
-            self.rawCapture = BytesIO()
-            self.stream = self.camera.capture_continuous(
-                self.rawCapture,
-                format=format,
-                use_video_port=True
-            )
-
-        def get(self):
-            try:
-                if next(self.stream):
-                    self.rawCapture.seek(0)
-                    imgBytes = self.rawCapture.read()
-                    self.rawCapture.seek(0)
-                    self.rawCapture.truncate()
-                    if len(imgBytes) == 0:
-                        return None
-
-                    return imgBytes
-                else:
-                    return None
-            except Exception as e:
-                print(e)
-                self.stop()
-
-        def stop(self):
-            self.stream.close()
-            self.rawCapture.close()
-            self.camera.close()
-
-
-    class PiCameraHandlerBuilder:
-        def __init__(self, format='jpeg', resolution=None, framerate=None):
             self.format = format
             self.resolution = resolution
             self.framerate = framerate
 
-        def __call__(self):
-            return PiCameraHandler(self.format, self.resolution, self.framerate)
+        def start(self):
+            self.camera = PiCamera()
+            if self.resolution is not None:
+                self.camera.resolution = self.resolution
+            if self.framerate is not None:
+                self.camera.framerate = self.framerate
+
+            self.rawCapture = BytesIO()
+            self.stream = self.camera.capture_continuous(
+                self.rawCapture,
+                format=self.format,
+                use_video_port=True
+            )
+            self.is_running = True
+
+        def read(self):
+            self.require_running()
+            if next(self.stream):
+                self.rawCapture.seek(0)
+                imgBytes = self.rawCapture.read()
+                self.rawCapture.seek(0)
+                self.rawCapture.truncate()
+                if len(imgBytes) == 0:
+                    return None
+
+                return imgBytes
+            else:
+                return None
+
+        def stop(self):
+            self.require_running()
+            self.stream.close()
+            self.rawCapture.close()
+            self.camera.close()
+            self.is_running = False
 
 
-    class KeyboardHandler:
-        def get(self):
+    class KeyboardHandler(HandleBase):
+        def read(self):
             pass
 
 
-    class CameraHandler:
-        def get(self):
+    class CameraHandler(HandleBase):
+        def read(self):
             pass
 
 else:
-    class TiltSensorHandler:
-        def get(self):
+    class TiltSensorHandler(HandleBase):
+        def read(self):
             pass
 
-    class StartStopButtonHandler:
-        def get(self):
+    class StartStopButtonHandler(HandleBase):
+        def read(self):
             pass
 
 
     import keyboard
-    class KeyboardHandler:
+    class KeyboardHandler(HandleBase):
+        is_running = True
         units = 0.1
 
-        def get(self):
+        def start(self):
+            pass
+
+        def stop(self):
+            pass
+
+        def read(self):
             ret = [0, 0]
             if keyboard.is_pressed("a"):
                 ret[0] = self.units
@@ -214,15 +224,17 @@ else:
 
 
     import cv2
-    class CameraHandler:
-        def __init__(self):
+    class CameraHandler(HandleBase):
+        def start(self):
             self.webcam = cv2.VideoCapture(0)
             self.frame_size = (
                 self.webcam.get(cv2.CAP_PROP_FRAME_WIDTH),
                 self.webcam.get(cv2.CAP_PROP_FRAME_HEIGHT)
             )
+            self.is_running = True
 
-        def get(self):
+        def read(self):
+            self.require_running()
             # We get a new frame from the webcam
             _, frame = self.webcam.read()
             if type(frame).__module__ == numpy.__name__:
@@ -230,14 +242,52 @@ else:
             else:
                 return None
 
-        def close(self):
+        def stop(self):
+            self.require_running()
             self.webcam.release()
             cv2.destroyAllWindows()
+            self.is_running = False
 
 
-class RandomHandler:
-    def get(self):
+class RandomHandler(HandleBase):
+    is_running = True
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def read(self):
         return random.randint(-5, 5)
 
 
+class FileHandler(HandleBase):
+    def __init__(self, file):
+        self.file = file
+        self.file_conn = None
 
+    def start(self):
+        self.file_conn = open(self.file, "r")
+        self.is_running = True
+
+    def stop(self):
+        self.require_running()
+        self.file_conn.close()
+        self.is_running = False
+
+    def read(self):
+        return self.file_conn.readline().rstrip()
+
+
+class NullHandler(HandleBase):
+    is_running = True
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def read(self):
+        return None

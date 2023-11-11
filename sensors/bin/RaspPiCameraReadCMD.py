@@ -7,7 +7,8 @@ directory = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(directory)
 sys.path.append(parent)
 
-from read.Readers import RaspPiCameraReader
+from read.Handlers import PiCameraHandler
+from read.Readers import CameraReader
 from read.Manager import ManageRead
 import platform
 
@@ -19,7 +20,9 @@ if __name__ == '__main__':
     args.pop(0) # get rid of the first argument, it's this file's name.
     read_rate = float(args.pop(0))
     m = ManageRead(
-            RaspPiCameraReader()
+            CameraReader(
+                PiCameraHandler()
+            )
     )
 
     m.runProc()

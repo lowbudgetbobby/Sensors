@@ -16,7 +16,7 @@ from write.Types import ImageWriteObject
 
 if __name__ == '__main__':
     args = list(sys.argv)
-    args.pop(0) # get rid of the first argument, it's this file's name.
+    args.pop(0)  # get rid of the first argument, it's this file's name.
     read_rate = float(args.pop(0))
     m = ManageRead(
             CameraReader()

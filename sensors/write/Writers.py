@@ -1,34 +1,24 @@
 from sensors.write.Handlers import ImageToDesktopHandler
 from sensors.write.Types import ImageWriteObject
+from sensors.readerwriterbase import ReaderWriter, HandleBase
 
 
-class Writer:
-    fields = []
-    _handle = None
-    handle_class = None
+class Writer(ReaderWriter):
+    def do_write(self, *args, **kwargs):
+        self.do_readwrite(*args, **kwargs)
+        if self.error is not None:
+            return False, self.error
 
-    def __init__(self, handle_class=None):
-        self.handle_class = handle_class
-
-    @property
-    def handle(self):
-        if self._handle is None:
-            self._handle = self.handle_class()
-        return self._handle
-
-    def do_write(self, data):
-        Exception('do_write must be over written.')
+        return self.data, None
 
 
 class ImageWriter(Writer):
-    handle_class = ImageToDesktopHandler
+    def __init__(self, handler: HandleBase = ImageToDesktopHandler()):
+        super().__init__(handler)
 
-    def __init__(self, handle_class=ImageToDesktopHandler):
-        super().__init__(handle_class)
-
-    def do_write(self, data: ImageWriteObject):
+    def do(self, data: ImageWriteObject, *args, **kwargs):
         if data.size is not None:
-            img = self.handle_class.resize(data.img, data.size)
+            img = self.handle.resize(data.img, data.size)
         else:
             img = data.img
 
