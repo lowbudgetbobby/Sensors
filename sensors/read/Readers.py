@@ -1,6 +1,6 @@
 from sensors.read.Handlers import (RandomHandler, TiltSensorHandler,
                                    KeyboardHandler, CameraHandler, FileHandler,
-                                   NullHandler)
+                                   NullHandler, StartStopButtonHandler)
 from sensors.readerwriterbase import ReaderWriter, HandleBase
 import os
 import numpy as np
@@ -92,6 +92,13 @@ class TiltSensorReader(Reader):
             self.data = new_data
 
         return self.data
+
+
+class StartStopButtonReader(Reader):
+    def __init__(self, handler: HandleBase = StartStopButtonHandler()):
+        super().__init__(
+            handler
+        )
 
 
 class KeyboardReader(Reader):
