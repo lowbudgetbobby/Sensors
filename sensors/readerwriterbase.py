@@ -40,6 +40,7 @@ if is_raspberrypi:
             self.is_running = True
 
         def _init_mem(self):
+            GPIO.setmode(GPIO.BCM)
             GPIO.setup(READ_STATE_PIN, GPIO.IN)
             GPIO.setup(WRITE_RESET_PIN, GPIO.OUT)
 

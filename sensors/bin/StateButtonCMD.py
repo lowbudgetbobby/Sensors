@@ -33,7 +33,7 @@ if __name__ == '__main__':
     while True:
         if curr_count == count_lim:
             curr_count = 0
-            state_write_proc.writeProc(1)
+            state_write_proc.writeProc(None)
         else:
             curr_count += 1
             print(state_check_proc.readProc(False))

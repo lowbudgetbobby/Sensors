@@ -56,3 +56,5 @@ else:
     class StateButtonHandler(StateButtonHandlerBase):
         def write(self, *args, **kwargs):
             self.reset()
+
+            return True
