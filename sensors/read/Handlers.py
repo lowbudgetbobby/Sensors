@@ -2,7 +2,7 @@ import random
 import platform
 import numpy
 from .Types import TiltSensorAnglesDelta
-from sensors.readerwriterbase import HandleBase
+from sensors.readerwriterbase import HandleBase, StateButtonHandlerBase
 
 is_raspberrypi = False
 try:
@@ -101,31 +101,11 @@ if is_raspberrypi:
 
 
     READ_STATE_PIN = 5
-    # WRITE_START_PIN = 6
-    WRITE_RESET_PIN = 13
 
-    class StartStopButtonHandler(HandleBase):
-        def start(self):
-            self._init_mem()
-            self.reset()
-            self.is_running = True
-
-        def _init_mem(self):
-            GPIO.setup(READ_STATE_PIN, GPIO.IN)
-            GPIO.setup(WRITE_RESET_PIN, GPIO.OUT)
-
-        def reset(self):
-            GPIO.output(WRITE_RESET_PIN, GPIO.HIGH)
-            GPIO.output(WRITE_RESET_PIN, GPIO.LOW)
-
+    class StateButtonHandler(StateButtonHandlerBase):
         def read(self):
             self.require_running()
             return GPIO.input(READ_STATE_PIN)
-
-        def stop(self):
-            self.require_running()
-            GPIO.cleanup()
-            self.is_running = False
 
 
     from picamera import PiCamera
@@ -192,7 +172,8 @@ else:
         def read(self):
             pass
 
-    class StartStopButtonHandler(HandleBase):
+
+    class StateButtonHandler(StateButtonHandlerBase):
         def read(self):
             pass
 

@@ -3,13 +3,9 @@ import os
 import cv2
 import time
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(directory)
-sys.path.append(parent)
-
-from read.Handlers import PiCameraHandler
-from read.Readers import CameraReader
-from read.Manager import ManageRead
+from sensors.read.Handlers import PiCameraHandler
+from sensors.read.Readers import CameraReader
+from sensors.read.Manager import ManageRead
 import platform
 
 if platform.uname().node != 'raspberrypi':

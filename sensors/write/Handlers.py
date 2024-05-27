@@ -1,5 +1,5 @@
 import platform
-from sensors.readerwriterbase import HandleBase
+from sensors.readerwriterbase import HandleBase, StateButtonHandlerBase
 
 is_raspberrypi = False
 try:
@@ -38,7 +38,7 @@ if not is_raspberrypi:
             return True
 
 
-    class StartStopButtonHandler(HandleBase):
+    class StateButtonHandler(StateButtonHandlerBase):
         def write(self):
             pass
 
@@ -56,26 +56,6 @@ else:
         def write(self, img, windowName):
             pass
 
-
-    READ_STATE_PIN = 5
-    # WRITE_START_PIN = 6
-    WRITE_RESET_PIN = 13
-
-    class StartStopButtonHandler(HandleBase):
-        def start(self):
-            self._init_mem()
-            self.write()
-            self.is_running = True
-
-        def _init_mem(self):
-            GPIO.setup(READ_STATE_PIN, GPIO.IN)
-            GPIO.setup(WRITE_RESET_PIN, GPIO.OUT)
-
+    class StateButtonHandler(StateButtonHandlerBase):
         def write(self, *args, **kwargs):
-            GPIO.output(WRITE_RESET_PIN, GPIO.HIGH)
-            GPIO.output(WRITE_RESET_PIN, GPIO.LOW)
-
-        def stop(self):
-            self.require_running()
-            GPIO.cleanup()
-            self.is_running = False
+            self.reset()

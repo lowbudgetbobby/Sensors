@@ -2,12 +2,9 @@ import sys
 import os
 import time
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(directory)
-sys.path.append(parent)
-
-from read.Readers import StartStopButtonReader
-from read.Manager import ManageRead
+from sensors.read.Readers import Reader
+from sensors.read.Handlers import StateButtonHandler
+from sensors.read.Manager import ManageRead
 
 
 if __name__ == '__main__':
@@ -15,7 +12,9 @@ if __name__ == '__main__':
     args.pop(0) # get rid of the first argument, it's this file's name.
     read_rate = float(args.pop(0))
     m = ManageRead(
-            StartStopButtonReader()
+        Reader(
+            StateButtonHandler()
+        )
     )
 
     m.runProc()

@@ -1,12 +1,8 @@
 import sys
 import os
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(directory)
-sys.path.append(parent)
-
-from read.Readers import RandomReader
-from read.Manager import ManageRead
+from sensors.read.Readers import RandomReader
+from sensors.read.Manager import ManageRead
 
 import time
 

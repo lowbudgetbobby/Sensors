@@ -2,12 +2,8 @@ import sys
 import os
 import time
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(directory)
-sys.path.append(parent)
-
-from read.Readers import FileReader
-from read.Manager import ManageRead
+from sensors.read.Readers import FileReader
+from sensors.read.Manager import ManageRead
 
 
 if __name__ == '__main__':
