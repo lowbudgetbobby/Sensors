@@ -204,6 +204,17 @@ else:
             return ret
 
 
+    class QuitKeyboardHandler(HandleBase):
+        def start(self):
+            pass
+
+        def stop(self):
+            pass
+
+        def read(self):
+            return keyboard.is_pressed("q")
+
+
     import cv2
     class CameraHandler(HandleBase):
         def start(self):
@@ -226,7 +237,7 @@ else:
         def stop(self):
             self.require_running()
             self.webcam.release()
-            cv2.destroyAllWindows()
+            # cv2.destroyAllWindows()
             self.is_running = False
 
 

@@ -25,6 +25,7 @@ class ManageReaderWriter:
             self._thread_loop(queue, error_queue, clear_event)
 
         self.is_running = False
+        self.reader_writer.close()
 
     def _thread_loop(self, queue, error_queue, clear_event):
         raise Exception('method not implemented')

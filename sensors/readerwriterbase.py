@@ -52,7 +52,7 @@ if is_raspberrypi:
             GPIO.cleanup()
             self.is_running = False
 else:
-    class StateButtonHandler(HandleBase):
+    class StateButtonHandlerBase(HandleBase):
         pass
 
 
@@ -78,4 +78,8 @@ class ReaderWriter:
     def do(self, *args, **kwargs):
         # read/write specific code goes here.
         raise Exception('%s.%s: Method not implemented' % (self.__class__, 'do'))
+
+    def close(self):
+        if self.handle and self.handle.is_running:
+            self.handle.stop()
 

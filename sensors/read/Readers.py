@@ -5,9 +5,6 @@ from sensors.readerwriterbase import ReaderWriter, HandleBase
 import os
 import numpy as np
 
-directory = os.path.dirname(os.path.realpath(__file__))
-parent_dir = os.path.dirname(directory)
-
 
 class Reader(ReaderWriter):
 

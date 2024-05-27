@@ -7,6 +7,8 @@ from sensors.read.Readers import CameraReader
 from sensors.read.Manager import ManageRead
 from sensors.write.Writers import ImageWriter
 from sensors.write.Manager import ManageWriter
+from sensors.read.Readers import Reader
+from sensors.read.Handlers import QuitKeyboardHandler
 from sensors.write.Types import ImageWriteObject
 
 
@@ -18,14 +20,24 @@ if __name__ == '__main__':
             CameraReader()
     )
 
+    q = ManageRead(
+        Reader(
+            QuitKeyboardHandler()
+        )
+    )
+
     w = ManageWriter(
         ImageWriter()
     )
 
     m.runProc()
+    q.runProc()
     w.runProc()
-    while True:
+
+    q_state = q.readProc()
+    while not q_state:
         data = m.readProc(False)
+        q_state = q.readProc()
 
         if data is not None:
             w.writeProc(
@@ -34,7 +46,9 @@ if __name__ == '__main__':
         else:
             print("dropped frame.")
 
-
         time.sleep(read_rate)
 
-    sys.exit(1)
+    m.stopProc()
+    q.stopProc()
+    w.stopProc()
+    print('Key interupt. Stopping stream.')

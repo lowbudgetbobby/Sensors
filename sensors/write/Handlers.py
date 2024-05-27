@@ -21,7 +21,7 @@ if not is_raspberrypi:
             pass
 
         def stop(self):
-            pass
+            cv2.destroyAllWindows()
 
         @staticmethod
         def resize(img, size):
@@ -30,10 +30,7 @@ if not is_raspberrypi:
 
         def write(self, img, windowName):
             cv2.imshow(windowName, img)
-            k = cv2.waitKey(1)
-            if k == 27:
-                cv2.destroyAllWindows()
-                raise Exception('Key interupt. Stopping stream.')
+            cv2.waitKey(1)
 
             return True
 
