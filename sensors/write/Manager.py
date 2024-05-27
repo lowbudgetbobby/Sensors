@@ -10,14 +10,13 @@ class ManageWriter(ManageReaderWriter):
     def __init__(self, writer: Writer):
         super().__init__(writer)
 
-    def _do_thread_proc(self, queue, error_queue, clear_event):
-        while True:
-            if not queue.empty():
-                data = self.queue.get()
-                success, error = self.reader_writer.do_write(data)
-                if not success:
-                    clear_event.set()
-                    error_queue.put(error)
+    def _thread_loop(self, queue, error_queue, clear_event):
+        if not queue.empty():
+            data = self.queue.get()
+            success, error = self.reader_writer.do_write(data)
+            if not success:
+                clear_event.set()
+                error_queue.put(error)
 
     def writeProc(self, data):
         if self.queue.full():

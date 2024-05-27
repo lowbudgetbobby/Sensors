@@ -10,24 +10,23 @@ class ManageRead(ManageReaderWriter):
     def __init__(self, reader: Reader):
         super().__init__(reader)
 
-    def _do_thread_proc(self, queue, error_queue, clear_event):
-        while True:
-            while not queue.empty():
-                # remove whatever is queued so we can refresh the value.
-                try:
-                    queue.get_nowait()
-                except Exception:
-                    pass
+    def _thread_loop(self, queue, error_queue, clear_event):
+        while not queue.empty():
+            # remove whatever is queued so we can refresh the value.
+            try:
+                queue.get_nowait()
+            except Exception:
+                pass
 
-            if clear_event.is_set():
-                self.reader_writer.dump()
-                clear_event.clear()
+        if clear_event.is_set():
+            self.reader_writer.dump()
+            clear_event.clear()
 
-            data, error = self.reader_writer.do_read()
-            if error:
-                error_queue.put(error)
-            else:
-                queue.put(data)
+        data, error = self.reader_writer.do_read()
+        if error:
+            error_queue.put(error)
+        else:
+            queue.put(data)
 
     def readProc(self, reset_data=True):
         error = None
