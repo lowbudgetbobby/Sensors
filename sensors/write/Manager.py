@@ -1,4 +1,3 @@
-from multiprocessing import Queue, Event
 import multiprocessing as mp
 from sensors.write.Writers import Writer
 from sensors import ManageReaderWriter

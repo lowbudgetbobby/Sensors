@@ -1,6 +1,6 @@
 from multiprocessing import Queue, Event
 import multiprocessing as mp
-from readerwriterbase import ReaderWriter
+from sensors.readerwriterbase import ReaderWriter
 
 if __name__ == '__main__' and mp.get_start_method() != 'spawn':
     mp.set_start_method('spawn')
